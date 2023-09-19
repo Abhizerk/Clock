@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <style>
+        /* CSS for centering the clocks */
+        body {
+            background-color: skyblue;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* CSS for the clock container */
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* CSS for each clock */
+        .clock {
+            width: 200px;
+            height: 200px;
+            border: 10px solid #333;
+            border-radius: 50%;
+            position: relative;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .hour, .minute, .second {
+            position: absolute;
+            width: 50%;
+            height: 2px;
+            background: #333;
+            top: 50%;
+            transform-origin: 100%;
+            transform: translateY(-50%);
+        }
+
+        .minute {
+            height: 1px;
+            background: #666;
+        }
+
+        .second {
+            height: 1px;
+            background: red;
+        }
+
+        /* CSS for the clock label */
+        .clock-label {
+            text-align: center;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        /* CSS for the clock time text */
+        .clock-time {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+        }
+
+        /* CSS for clock numbers */
+        .clock-number {
+            position: absolute;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .number-12 {
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .number-3 {
+            bottom: 50%;
+            left: calc(100% - 20px);
+            transform: translateY(50%);
+        }
+
+        .number-6 {
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .number-9 {
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+        }
+    </style>
+</head>
+<body>
+    <div class="clock-container">
+        <select id="timezone-select">
+            <option value="Asia/Kolkata">Asia/Kolkata</option>
+            <option value="America/New_York">America/New_York</option>
+            <option value="America/Los_Angeles">America/Los_Angeles</option>
+            <option value="Europe/Berlin">Europe/Berlin</option>
+            <option value="Australia/Sydney">Australia/Sydney</option>
+        </select>
+        <div class="clock" id="selected-clock">
+            <div class="hour"></div>
+            <div class="minute"></div>
+            <div class="second"></div>
+           
+            <div class="clock-number number-12">12</div>
+            <div class="clock-number number-3">3</div>
+            <div class="clock-number number-6">6</div>
+            <div class="clock-number number-9">9</div>
+        </div>
+    </div>
+
+    <script>
+        function updateClock(timeZone) {
+            const clock = document.getElementById("selected-clock");
+            const labelElement = document.getElementById("selected-label");
+            const timeElement = document.getElementById("selected-time");
+            const hourElement = clock.querySelector(".hour");
+            const minuteElement = clock.querySelector(".minute");
+            const secondElement = clock.querySelector(".second");
+
+            const now = new Date();
+            const formatter = new Intl.DateTimeFormat("en-US", {
+                hour: "numeric",
+                minute: "numeric",
+                second: "numeric",
+                timeZone: timeZone
+            });
+
+            const timeString = formatter.format(now);
+            const [hours, minutes, seconds] = timeString.split(/:| /);
+
+            const hourDeg = (360 / 12) * (parseInt(hours) % 12) + (360 / 12) * (minutes / 60) + 90;
+            const minuteDeg = (360 / 60) * minutes + 90;
+            const secondDeg = (360 / 60) * seconds + 90;
+
+            hourElement.style.transform = `rotate(${hourDeg}deg)`;
+            minuteElement.style.transform = `rotate(${minuteDeg}deg)`;
+            secondElement.style.transform = `rotate(${secondDeg}deg)`;
+            labelElement.textContent = `${timeZone}`;
+            timeElement.textContent = `${timeString}`;
+        }
+
+        const timezoneSelect = document.getElementById("timezone-select");
+        timezoneSelect.addEventListener("change", function () {
+            const selectedTimeZone = this.value;
+            updateClock(selectedTimeZone);
+        });
+
+        // Initial call to set the clock to the selected time zone
+        updateClock(timezoneSelect.value);
+    </script>
+</body>
+</html>
